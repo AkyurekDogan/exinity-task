@@ -6,12 +6,10 @@ package dto
 
 // Partner represents the partner data
 type Partner struct {
-	Id     string   `json:"id"`
-	Name   string   `json:"name"`
-	Loc    Location `json:"location"`
-	Radius Measure  `json:"radius"`
-	Rating *Rating  `json:"rating"`
-	Skills *Skill   `json:"skills"`
+	Id     string  `json:"id"`
+	Name   string  `json:"name"`
+	Rating *Rating `json:"rating"`
+	Skills *Skill  `json:"skills"`
 }
 
 // Rating represents the rating data

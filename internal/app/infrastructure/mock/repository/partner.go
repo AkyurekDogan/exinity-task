@@ -7,7 +7,7 @@ package repository
 import (
 	reflect "reflect"
 
-	model "github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/model"
+	model "github.com/AkyurekDogan/exinity-task/internal/app/model"
 	gomock "github.com/golang/mock/gomock"
 )
 

@@ -7,7 +7,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/model"
+	"github.com/AkyurekDogan/exinity-task/internal/app/model"
 )
 
 var (

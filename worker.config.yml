@@ -1,0 +1,6 @@
+database:
+  password: "mypassword123!"
+  username: "postgress"
+  host: go-exinity-task-postgress # writer instance
+  port: 5432
+  database: exinity_task

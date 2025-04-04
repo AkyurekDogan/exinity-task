@@ -16,8 +16,6 @@ import (
 	"github.com/AkyurekDogan/exinity-task/internal/app/service"
 	httpSwagger "github.com/swaggo/http-swagger"
 
-	_ "github.com/AkyurekDogan/exinity-task/docs/swagger" // Import Swagger docs
-
 	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v2"
@@ -27,16 +25,8 @@ const (
 	// ENV environment file path
 	ENV = ".env"
 	//ENV_CNF_PATH config path
-	ENV_CNF_PATH = "CONFIG_PATH"
+	ENV_CNF_PATH = "WORKER_CONFIG_PATH"
 )
-
-// @title Exinity Task
-// @version 1.0
-// @description This project is build for Exinity take home assessment.
-// @contact.name Dogan Akyurek
-// @contact.email akyurek.dogan.dgn@gmail.com
-// @host localhost:1989
-// @BasePath /
 
 // main entry point
 func main() {
@@ -55,7 +45,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading configuration YAML file: %v", err)
 	}
-	var config model.Config
+	var config model.WorkerConfig
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
 		log.Fatalf("Error unmarshalling YAML file: %v", err)
@@ -72,19 +62,19 @@ func main() {
 		config.Database.Database,
 	)
 
-	dbDriverR, err := dbDriver.Init()
+	dbDriverInstance, err := dbDriver.Init()
 	if err != nil {
 		log.Fatalf("Could not connect to the database: %s\n", err)
 	}
 
 	// initialize repository
-	repoSymbolData := repository.NewSymbolData(dbDriverR)
+	repoSymbolData := repository.NewSymbolData(dbDriverInstance)
 
 	// initialize services
 	srvSymbolData := service.NewRating(repoSymbolData)
 
 	// handlers
-	handlerListener := handler.NewMatch(srvSymbolData)
+	handlerWorker := handler.NewMatch(srvSymbolData)
 	// Create a new router
 	r := chi.NewRouter()
 
