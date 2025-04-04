@@ -1,0 +1,245 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This project is build for Exinity take home assessment.",
+        "title": "Exinity Task",
+        "contact": {
+            "name": "Dogan Akyurek",
+            "email": "akyurek.dogan.dgn@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:1989",
+    "basePath": "/",
+    "paths": {
+        "/match": {
+            "get": {
+                "description": "Regarding the customer parameters location and material type, the endpoint returns the matched partners with the",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "match"
+                ],
+                "summary": "Returns the matched relevant partners for the customer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "selected material type",
+                        "name": "material_type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "customer location as lattitute",
+                        "name": "lat",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "customer location as longtitute",
+                        "name": "long",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MatchListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/partner": {
+            "get": {
+                "description": "Regarding the partner id parameter, returns the relevant partner with all details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "partner"
+                ],
+                "summary": "Returns the partner by partner_id parameter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "patner_id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Partner"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.Error": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "message": {
+                    "type": "string"
+                },
+                "status_code": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.Location": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "type": "number"
+                },
+                "long": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.Match": {
+            "type": "object",
+            "properties": {
+                "distance": {
+                    "$ref": "#/definitions/dto.Measure"
+                },
+                "location": {
+                    "$ref": "#/definitions/dto.Location"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "partner_id": {
+                    "type": "string"
+                },
+                "radius": {
+                    "$ref": "#/definitions/dto.Measure"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "$ref": "#/definitions/dto.Rating"
+                },
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.MatchFilter": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "$ref": "#/definitions/dto.Location"
+                },
+                "material_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MatchListResponse": {
+            "type": "object",
+            "properties": {
+                "filter": {
+                    "$ref": "#/definitions/dto.MatchFilter"
+                },
+                "matches": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Match"
+                    }
+                }
+            }
+        },
+        "dto.Measure": {
+            "type": "object",
+            "properties": {
+                "metric": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.Partner": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/dto.Location"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "radius": {
+                    "$ref": "#/definitions/dto.Measure"
+                },
+                "rating": {
+                    "$ref": "#/definitions/dto.Rating"
+                },
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.Rating": {
+            "type": "object",
+            "properties": {
+                "value_avg": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

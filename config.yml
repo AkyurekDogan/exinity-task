@@ -1,0 +1,9 @@
+server:
+  host: ":1989"
+  port: 1989
+database:
+  password: "mypassword123!"
+  username: "postgress"
+  host: go-exinity-task-postgress
+  port: 5432
+  database: exinity_task
