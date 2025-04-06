@@ -1,6 +1,17 @@
+provider:
+  binance:
+    scheme: "wss"
+    host: "stream.binance.com:443"
+    path: "/stream"
+    key: "streams"
+    separator: "@trade"
+    symbols:
+      - btcusdt
+      - ethusdt
+      - pepeusdt
 database:
   password: "mypassword123!"
   username: "postgress"
-  host: go-exinity-task-postgress # writer instance
+  host: localhost
   port: 5432
   database: exinity_task

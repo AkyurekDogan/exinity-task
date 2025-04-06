@@ -7,6 +7,16 @@ package worker
 
 // Worker represents the YAML structure
 type Config struct {
+	Provider struct {
+		Binance struct {
+			Scheme    string   `yaml:"scheme"`
+			Host      string   `yaml:"host"`
+			Path      string   `yaml:"path"`
+			Key       string   `yaml:"key"`
+			Separator string   `yaml:"separator"`
+			Symbols   []string `yaml:"symbols"`
+		} `yaml:"binance"`
+	} `yaml:"provider"`
 	Database struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`

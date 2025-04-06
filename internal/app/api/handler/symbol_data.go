@@ -4,7 +4,6 @@ The Handler package to manage the request-response pipeline handlers
 package handler
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/AkyurekDogan/exinity-task/internal/app/service"
@@ -38,14 +37,12 @@ func NewSymbolData(srvSymbolData service.SymbolData) SymbolData {
 // @Failure 500 {object} dto.Error "Internal Server Error"
 // @Router /partner [get]
 func (s *partner) Get(w http.ResponseWriter, r *http.Request) {
-	err := s.srvSymbolData.Get()
-	if err != nil {
-		if errors.Is(err, service.ErrNoPartner) {
-			s.WriteErrorRespone(w, http.StatusBadRequest, "invalid parameters are provided", err)
-			return
-		}
-		s.WriteErrorRespone(w, http.StatusInternalServerError, "internal server error", err)
-		return
-	}
-	s.WriteSuccessRespone(w, http.StatusOK, nil)
+	/*
+		 	err := s.srvSymbolData.Get()
+			if err != nil {
+				s.WriteErrorRespone(w, http.StatusInternalServerError, "internal server error", err)
+				return
+			}
+			s.WriteSuccessRespone(w, http.StatusOK, nil)
+	*/
 }

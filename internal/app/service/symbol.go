@@ -4,40 +4,36 @@ Service package handles the services for business logic and data processing
 package service
 
 import (
-	"errors"
+	"context"
+	"fmt"
 
 	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/repository"
-)
-
-var (
-	ErrNoPartner = errors.New("the symbol data is not found")
+	"github.com/AkyurekDogan/exinity-task/internal/app/model"
 )
 
 // SymbolData interface provides interface for SymbolData service
 type SymbolData interface {
-	Get() error
-	Insert() error
+	Insert(ctx context.Context, c model.Candle) error
 }
 
 type symbolData struct {
-	dbSymbolData repository.SymbolData
+	dbSymbolData repository.Symbol
 }
 
 // NewSymbolData creates a new instance of SymbolData service.
 func NewSymbolData(
-	repoSymbolData repository.SymbolData,
+	repoSymbolData repository.Symbol,
 ) SymbolData {
 	return &symbolData{
 		dbSymbolData: repoSymbolData,
 	}
 }
 
-// Get returns the relevant symbol data
-func (s *symbolData) Get() error {
-	return nil
-}
-
 // Insert inserts the symbol data into the database
-func (s *symbolData) Insert() error {
+func (s *symbolData) Insert(ctx context.Context, c model.Candle) error {
+	err := s.dbSymbolData.Insert(ctx, c)
+	if err != nil {
+		return fmt.Errorf("error in insert service: %w", err)
+	}
 	return nil
 }
