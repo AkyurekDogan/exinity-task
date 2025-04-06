@@ -9,8 +9,8 @@ It is used to set up the environment variables and other settings
 */
 package api
 
-// Api represents the YAML structure
-type Api struct {
+// Config represents the YAML structure
+type Config struct {
 	Server struct {
 		Host string `yaml:"host"`
 	} `yaml:"server"`

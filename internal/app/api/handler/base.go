@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/AkyurekDogan/exinity-task/internal/app/dto"
+	"github.com/AkyurekDogan/exinity-task/internal/app/api/dto"
 )
 
 // Base handles the base operations for handlers

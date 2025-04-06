@@ -8,12 +8,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/AkyurekDogan/exinity-task/internal/app/handler"
+	"github.com/AkyurekDogan/exinity-task/internal/app/api"
+	"github.com/AkyurekDogan/exinity-task/internal/app/api/handler"
+	"github.com/AkyurekDogan/exinity-task/internal/app/api/middlewares"
 	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/drivers"
-	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/middlewares"
-	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/model"
 	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/repository"
 	"github.com/AkyurekDogan/exinity-task/internal/app/service"
+
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "github.com/AkyurekDogan/exinity-task/docs/swagger" // Import Swagger docs
@@ -55,7 +56,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading configuration YAML file: %v", err)
 	}
-	var config model.Config
+	var config api.Config
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
 		log.Fatalf("Error unmarshalling YAML file: %v", err)
@@ -81,10 +82,10 @@ func main() {
 	repoSymbolData := repository.NewSymbolData(dbDriverR)
 
 	// initialize services
-	srvSymbolData := service.NewRating(repoSymbolData)
+	srvSymbolData := service.NewSymbolData(repoSymbolData)
 
 	// handlers
-	handlerListener := handler.NewMatch(srvSymbolData)
+	handlerListener := handler.NewSymbolData(srvSymbolData)
 	// Create a new router
 	r := chi.NewRouter()
 

@@ -7,28 +7,27 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/AkyurekDogan/exinity-task/internal/app/dto"
 	"github.com/AkyurekDogan/exinity-task/internal/app/service"
 )
 
-// Partner represents the partner handler
-type Partner interface {
+// SymbolData represents the SymbolData handler
+type SymbolData interface {
 	Get(w http.ResponseWriter, r *http.Request)
 }
 
 type partner struct {
 	base
-	partnerService service.Partner
+	srvSymbolData service.SymbolData
 }
 
-// NewPartner returns the new partner service
-func NewPartner(ps service.Partner) Partner {
+// NewSymbolData returns the new partner service
+func NewSymbolData(srvSymbolData service.SymbolData) SymbolData {
 	return &partner{
-		partnerService: ps,
+		srvSymbolData: srvSymbolData,
 	}
 }
 
-// @Summary Returns the partner by partner_id parameter
+// @Summary The symbol data handler.
 // @Description Regarding the partner id parameter, returns the relevant partner with all details.
 // @Tags partner
 // @Accept json
@@ -39,18 +38,7 @@ func NewPartner(ps service.Partner) Partner {
 // @Failure 500 {object} dto.Error "Internal Server Error"
 // @Router /partner [get]
 func (s *partner) Get(w http.ResponseWriter, r *http.Request) {
-	// get query parameters
-	filter, err := dto.NewFilter(r)
-	if err != nil {
-		s.WriteErrorRespone(w, http.StatusBadRequest, "invalid query parameters", err)
-		return
-	}
-	// Validation check
-	if err := filter.CheckFilter(); err != nil {
-		s.WriteErrorRespone(w, http.StatusBadRequest, "invalid or insufficient input", err)
-		return
-	}
-	result, err := s.partnerService.Get(*filter)
+	err := s.srvSymbolData.Get()
 	if err != nil {
 		if errors.Is(err, service.ErrNoPartner) {
 			s.WriteErrorRespone(w, http.StatusBadRequest, "invalid parameters are provided", err)
@@ -59,5 +47,5 @@ func (s *partner) Get(w http.ResponseWriter, r *http.Request) {
 		s.WriteErrorRespone(w, http.StatusInternalServerError, "internal server error", err)
 		return
 	}
-	s.WriteSuccessRespone(w, http.StatusOK, result)
+	s.WriteSuccessRespone(w, http.StatusOK, nil)
 }

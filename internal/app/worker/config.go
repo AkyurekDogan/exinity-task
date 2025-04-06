@@ -6,7 +6,7 @@ It includes the database configuration such as username, password, host, port, a
 package worker
 
 // Worker represents the YAML structure
-type Worker struct {
+type Config struct {
 	Database struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
