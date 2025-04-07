@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package candle;
+
+option go_package = 
+"github.com/AkyurekDogan/exinity-task/internal/app/api/proto;candle";
+
+message Candle {
+  string symbol = 1;
+  int64 open_time = 2;
+  double open = 3;
+  double high = 4;
+  double low = 5;
+  double close = 6;
+  double volume = 7;
+  int64 close_time = 8;
+}
+
+message SubscribeRequest {
+  repeated string symbols = 1; // Optionally subscribe to specific symbols
+}
+
+service CandleService {
+  rpc SubscribeCandles (SubscribeRequest) returns (stream Candle);
+}

@@ -7,9 +7,11 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/AkyurekDogan/exinity-task/internal/app/aggregator"
 	"github.com/AkyurekDogan/exinity-task/internal/app/model"
+	candle "github.com/AkyurekDogan/exinity-task/internal/app/proto"
+	grpcserver "github.com/AkyurekDogan/exinity-task/internal/app/server"
 	"github.com/AkyurekDogan/exinity-task/internal/app/service"
-	"github.com/AkyurekDogan/exinity-task/internal/app/worker/aggregator"
 	"go.uber.org/zap"
 
 	"github.com/gorilla/websocket"
@@ -24,6 +26,7 @@ type symbol struct {
 	logger        *zap.SugaredLogger
 	srvSymbolData service.SymbolData
 	aggregator    aggregator.Aggregator
+	grpcServer    *grpcserver.CandleServiceServer
 }
 
 // NewSymbolData returns the new symbol data processor
@@ -31,11 +34,13 @@ func NewSymbolData(
 	logger *zap.SugaredLogger,
 	srvSymbolData service.SymbolData,
 	aggregator aggregator.Aggregator,
+	grpcServer *grpcserver.CandleServiceServer,
 ) Symbol {
 	return &symbol{
 		logger:        logger,
 		srvSymbolData: srvSymbolData,
 		aggregator:    aggregator,
+		grpcServer:    grpcServer,
 	}
 }
 
@@ -69,6 +74,18 @@ func (s *symbol) Process(ctx context.Context, conn *websocket.Conn) {
 					continue
 				}
 				s.logger.Infof("Candle saved: %s", oldCandle.Symbol)
+
+				// Broadcast to gRPC clients
+				s.grpcServer.BroadcastCandle(&candle.Candle{
+					Symbol:    oldCandle.Symbol,
+					OpenTime:  oldCandle.OpenTime,
+					Open:      oldCandle.Open,
+					High:      oldCandle.High,
+					Low:       oldCandle.Low,
+					Close:     oldCandle.Close,
+					Volume:    oldCandle.Volume,
+					CloseTime: oldCandle.CloseTime,
+				})
 			}
 		}
 	}

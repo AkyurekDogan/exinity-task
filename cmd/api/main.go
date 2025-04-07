@@ -1,25 +1,32 @@
 /*
-The main package for the service
+The main package for the worker service.
+This service is responsible for processing symbol data.
 */
 package main
 
 import (
+	"context"
 	"log"
-	"net/http"
+	"net"
+	"net/url"
 	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 
-	"github.com/AkyurekDogan/exinity-task/internal/app/api"
-	"github.com/AkyurekDogan/exinity-task/internal/app/api/handler"
-	"github.com/AkyurekDogan/exinity-task/internal/app/api/middlewares"
+	"github.com/AkyurekDogan/exinity-task/internal/app/aggregator"
+	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/config"
 	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/drivers"
+	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/logger"
 	"github.com/AkyurekDogan/exinity-task/internal/app/infrastructure/repository"
+	"github.com/AkyurekDogan/exinity-task/internal/app/processor"
+	candlepb "github.com/AkyurekDogan/exinity-task/internal/app/proto"
+	grpcserver "github.com/AkyurekDogan/exinity-task/internal/app/server"
 	"github.com/AkyurekDogan/exinity-task/internal/app/service"
+	"github.com/AkyurekDogan/exinity-task/internal/app/store"
+	"github.com/gorilla/websocket"
+	"google.golang.org/grpc"
 
-	httpSwagger "github.com/swaggo/http-swagger"
-
-	_ "github.com/AkyurekDogan/exinity-task/docs/swagger" // Import Swagger docs
-
-	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v2"
 )
@@ -31,83 +38,103 @@ const (
 	ENV_CNF_PATH = "CONFIG_PATH"
 )
 
-// @title Exinity Task
-// @version 1.0
-// @description This project is build for Exinity take home assessment.
-// @contact.name Dogan Akyurek
-// @contact.email akyurek.dogan.dgn@gmail.com
-// @host localhost:1989
-// @BasePath /
-
 // main entry point
 func main() {
-	// load environment variables
-	err := godotenv.Load(ENV)
+	// Initialize structured logger
+	log, err := logger.NewLogger()
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		panic("Failed to initialize logger: " + err.Error())
+	}
+	defer log.Sync() // Flush any buffered log entries
+	logger := log.Sugar()
+	// load environment variables
+	err = godotenv.Load(ENV)
+	if err != nil {
+		panic("Error loading .env file: " + err.Error())
 	}
 	// use environment variable to get the config path
 	appEnvConfigPath := os.Getenv(ENV_CNF_PATH)
 	if appEnvConfigPath == "" {
-		log.Fatalf("%s environment variable must be set", ENV_CNF_PATH)
+		panic("environment variable must be set: " + ENV_CNF_PATH)
 	}
 	// unmarshall the config file and get all settings in the configuration file.
 	yamlFile, err := os.ReadFile(appEnvConfigPath)
 	if err != nil {
-		log.Fatalf("Error reading configuration YAML file: %v", err)
+		panic("error reading configuration YAML file: " + err.Error())
 	}
-	var config api.Config
+	var config config.Config
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		log.Fatalf("Error unmarshalling YAML file: %v", err)
+		panic("error unmarshalling YAML file: " + err.Error())
 	}
-
 	// initialize db connector
-
-	// read driver
-	dbDriver := drivers.NewPostgres(
+	dbROnlyDriver := drivers.NewPostgres(
 		config.Database.Username,
 		config.Database.Password,
 		config.Database.Host,
 		config.Database.Port,
 		config.Database.Database,
 	)
-
-	dbDriverR, err := dbDriver.Init()
+	// initialize the connection.
+	dbROnlyDriverInstance, err := dbROnlyDriver.Init()
 	if err != nil {
-		log.Fatalf("Could not connect to the database: %s\n", err)
+		panic("Could not connect to the database: " + err.Error())
 	}
-
 	// initialize repository
-	repoSymbolData := repository.NewSymbolData(dbDriverR)
-
+	repoSymbolData := repository.NewSymbolData(dbROnlyDriverInstance)
 	// initialize services
 	srvSymbolData := service.NewSymbolData(repoSymbolData)
+	// in-memory thread-safe storage for symbol data
+	symbolCandleStore := store.NewCandleStore()
+	// initialize the aggregator
+	aggregator := aggregator.NewAggregator(symbolCandleStore)
 
-	// handlers
-	handlerListener := handler.NewSymbolData(srvSymbolData)
-	// Create a new router
-	r := chi.NewRouter()
+	// initialize the grpc server
+	grpcSrv := grpcserver.NewCandleServiceServer()
 
-	r.Use(middlewares.AddHeaderMiddleware())
-	// Define the endpoints
-	// Swagger UI endpoint
-	r.Get("/swagger/*", httpSwagger.WrapHandler)
-	r.Get("/match", handlerListener.Get)
-
-	r.Options("/*", func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers for preflight response
-		w.Header().Set("Allow", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Path", "/*")
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	// Start the HTTP server
-	err = http.ListenAndServe(config.Server.Host, r)
+	// process & listen the symbol data.
+	prcSymbolData := processor.NewSymbolData(logger, srvSymbolData, aggregator, grpcSrv)
+	// prepare the url for the websocket connection
+	u := url.URL{
+		Scheme: config.Provider.Binance.Scheme,
+		Host:   config.Provider.Binance.Host,
+		Path:   config.Provider.Binance.Path,
+		RawQuery: config.Provider.Binance.Key + "=" +
+			strings.Join(config.Provider.Binance.Symbols, config.Provider.Binance.Separator+"/") +
+			config.Provider.Binance.Separator,
+	}
+	// Connect to the WebSocket server
+	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatalf("Could not start server: %s\n", err)
+		panic("WebSocket dial error: " + err.Error())
+	}
+	defer conn.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	// run in a goroutine
+	go prcSymbolData.Process(ctx, conn)
+	// Start gRPC server in a separate goroutine
+	go startGRPCServer(grpcSrv)
+	// Wait for shutdown since it is async process
+	logger.Info("the worker is running...")
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+	<-stop
+	cancel()
+	logger.Info("the worker is shutting down...")
+}
+
+func startGRPCServer(grpcSrv *grpcserver.CandleServiceServer) {
+	lis, err := net.Listen("tcp", ":50051") // gRPC listens on this port
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	s := grpc.NewServer()
+	candlepb.RegisterCandleServiceServer(s, grpcSrv)
+
+	log.Println("gRPC server started on port 50051...")
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
 	}
 }

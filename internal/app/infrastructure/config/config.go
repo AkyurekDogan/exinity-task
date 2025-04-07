@@ -7,13 +7,20 @@ It is used to set up the server and other settings
 It is used to set up the logger and other settings
 It is used to set up the environment variables and other settings
 */
-package api
+package config
 
-// Config represents the YAML structure
+// Worker represents the YAML structure
 type Config struct {
-	Server struct {
-		Host string `yaml:"host"`
-	} `yaml:"server"`
+	Provider struct {
+		Binance struct {
+			Scheme    string   `yaml:"scheme"`
+			Host      string   `yaml:"host"`
+			Path      string   `yaml:"path"`
+			Key       string   `yaml:"key"`
+			Separator string   `yaml:"separator"`
+			Symbols   []string `yaml:"symbols"`
+		} `yaml:"binance"`
+	} `yaml:"provider"`
 	Database struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`

@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/AkyurekDogan/exinity-task/internal/app/model"
-	"github.com/AkyurekDogan/exinity-task/internal/app/worker/store"
+	"github.com/AkyurekDogan/exinity-task/internal/app/store"
 )
 
 const (

@@ -1,15 +1,18 @@
 # Makefile for Go project
+API="api"
 RUN_PATH="./cmd/api/main.go"
-API="cost-api"
 SWAGGER_URL="http://localhost:1989/swagger/index.html"
 PORT="1989"
 
 # Build the Go project
-build: build-clear
-	go build -o ./$(API) $(RUN_PATH)
+build: clear
+	@go build -o $(API) $(RUN_PATH)
 
-build-clear:
-	rm -f ./$(API)
+clear:
+	@rm -f ./$(API)
+
+run:
+	@go run $(RUN_PATH)
 
 run-local-docker-db:
 	docker build -t go-exinity-task-postgress -f ./scripts/database/Dockerfile ./scripts/database/
@@ -17,11 +20,7 @@ run-local-docker-db:
 
 run-docker-compose:
 	docker-compose up
-# Run the Go project
-run:
-	@echo "please visit http://localhost:1989/swagger/index.html to see the swagger ui."
-	go run $(RUN_PATH)
-	
+
 get-coverage:
 	go test -cover -tags="!exclude_from_coverage" ./...
 
@@ -34,6 +33,9 @@ get-coverage-output:
 get-coverage-output-html:
 	go test -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
+
+generate-grpc:
+	@protoc --go_out=./internal/app/api/proto  --go-grpc_out=./internal/app/api/proto ./internal/app/api/proto/candle.proto
 
 document:
 	echo "you can visit to localhost:6060 for auto generated documentation"
