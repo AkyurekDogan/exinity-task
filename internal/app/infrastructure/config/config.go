@@ -21,6 +21,11 @@ type Config struct {
 			Symbols   []string `yaml:"symbols"`
 		} `yaml:"binance"`
 	} `yaml:"provider"`
+	Service struct {
+		Network string `yaml:"network"`
+		Host    string `yaml:"host"`
+		Port    string `yaml:"port"`
+	} `yaml:"service"`
 	Database struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`

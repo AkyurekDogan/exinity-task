@@ -6,7 +6,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net"
 	"net/url"
 	"os"
@@ -25,6 +25,7 @@ import (
 	"github.com/AkyurekDogan/exinity-task/internal/app/service"
 	"github.com/AkyurekDogan/exinity-task/internal/app/store"
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	"github.com/joho/godotenv"
@@ -114,9 +115,10 @@ func main() {
 	// run in a goroutine
 	go prcSymbolData.Process(ctx, conn)
 	// Start gRPC server in a separate goroutine
-	go startGRPCServer(grpcSrv)
+	go startGRPCServer(config, grpcSrv, logger)
 	// Wait for shutdown since it is async process
 	logger.Info("the worker is running...")
+	// Graceful shutdown
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
@@ -124,17 +126,21 @@ func main() {
 	logger.Info("the worker is shutting down...")
 }
 
-func startGRPCServer(grpcSrv *grpcserver.CandleServiceServer) {
-	lis, err := net.Listen("tcp", ":50051") // gRPC listens on this port
+func startGRPCServer(
+	cnf config.Config,
+	grpcSrv *grpcserver.CandleServiceServer,
+	logger *zap.SugaredLogger,
+) {
+	lis, err := net.Listen(cnf.Service.Network, fmt.Sprintf("%s:%s", cnf.Service.Host, cnf.Service.Port)) // gRPC listens on this port
 	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
+		panic("Failed to listen: " + err.Error())
 	}
-
 	s := grpc.NewServer()
 	candlepb.RegisterCandleServiceServer(s, grpcSrv)
 
-	log.Println("gRPC server started on port 50051...")
+	logger.Infof("gRPC server started on %s:%s", cnf.Service.Host, cnf.Service.Port)
+	// Graceful shutdown
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
+		panic("Failed to serve: " + err.Error())
 	}
 }

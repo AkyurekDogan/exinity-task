@@ -9,6 +9,10 @@ provider:
       - btcusdt
       - ethusdt
       - pepeusdt
+service:
+  network: tcp
+  host: "localhost"
+  port: 50051
 database:
   password: "mypassword123!"
   username: "postgress"
