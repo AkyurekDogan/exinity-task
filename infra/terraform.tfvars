@@ -1,2 +1,5 @@
-# infra/terraform.tfvars
-region = "us-east-1"
+aws_region = "us-east-1"
+aws_region   = "us-east-1"
+project_name = "exinity-task"
+environment  = "dev"
+domain_name  = "www.exinity-task.com"

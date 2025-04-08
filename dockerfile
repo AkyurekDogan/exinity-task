@@ -2,7 +2,7 @@
 FROM golang:1.23-alpine AS builder
 
 # Set the working directory
-WORKDIR ./
+WORKDIR /
 
 # Copy go.mod and go.sum files
 COPY go.mod go.sum config.yml ./

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: exinity
+data:
+  BINANCE_STREAM_URL: "wss://stream.binance.com:443"
+  TRADE_SYMBOLS: "btcusdt,ethusdt,pepeusdt"

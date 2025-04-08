@@ -1,26 +1,36 @@
-# infra/environments/dev/variables.tf
-variable "vpc_cidr" {
-  default = "10.0.0.0/16"
-}
-
-variable "db_name" {
-  default = "exinity_task"
-}
-
 variable "db_username" {
-  default = "postgres"
+  description = "The username for the PostgreSQL database"
+  type        = string
+  default     = "dev_postgres_user"
 }
 
 variable "db_password" {
-  default = "mypassword123!"
+  description = "The password for the PostgreSQL database"
+  type        = string
+  sensitive   = true
+  default     = "dev_password_123"
 }
 
-variable "db_security_group_id" {
-  description = "Security group ID for the DB"
+variable "instance_type" {
+  description = "Type of EC2 instances to use in EKS"
   type        = string
+  default     = "t3.medium"
 }
 
-variable "db_subnet_group" {
-  description = "Subnet group for the DB"
+variable "node_count" {
+  description = "The number of nodes in the EKS cluster"
+  type        = number
+  default     = 2
+}
+
+variable "vpc_name" {
+  description = "Name of the VPC"
   type        = string
+  default     = "dev-vpc"
+}
+
+variable "subnet_count" {
+  description = "Number of subnets to create"
+  type        = number
+  default     = 3
 }
