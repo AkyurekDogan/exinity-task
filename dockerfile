@@ -19,12 +19,18 @@ RUN go build -o /go-exinity-task ./cmd/api/main.go
 FROM alpine:latest
 
 # Expose the port the server will run on
-EXPOSE 3000
+EXPOSE 50051
 
 # Copy the binary from the build stage
 COPY --from=builder /go-exinity-task /go-exinity-task
 COPY config.yml /config.yml
 COPY .env .env
 
+RUN apk add --no-cache postgresql-client
+
+# Copy wait script and make it executable
+COPY wait.sh /wait.sh
+RUN chmod +x /wait.sh
+
 # Command to run the application
-CMD ["/go-exinity-task"]
+CMD ["/wait.sh","/go-exinity-task"]

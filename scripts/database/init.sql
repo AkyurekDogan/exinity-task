@@ -1,10 +1,12 @@
+-- Create the symbol_data table with the specified definition
 CREATE TABLE symbol_data (
-	symbol varchar(50) NOT NULL,
-	open_time numeric(20, 10) NOT NULL,
-	open numeric(20, 10) NOT NULL,
-	high numeric(20, 10) NOT NULL,
-	low numeric(20, 10) NOT NULL,
-	close numeric(20, 10) NOT NULL,
-	volume numeric(20, 10) NOT null,
-	close_time numeric(20, 10) NOT NULL
+    symbol VARCHAR(50) NOT NULL,
+    open_time INT8 NOT NULL,
+    "open" NUMERIC(30, 20) NOT NULL,
+    high NUMERIC(30, 20) NOT NULL,
+    low NUMERIC(30, 20) NOT NULL,
+    "close" NUMERIC(30, 20) NOT NULL,
+    volume NUMERIC(40, 20) NOT NULL,
+    close_time INT8 NOT NULL
 );
+

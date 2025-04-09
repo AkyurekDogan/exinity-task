@@ -68,6 +68,7 @@ func main() {
 	if err != nil {
 		panic("error unmarshalling YAML file: " + err.Error())
 	}
+
 	// initialize db connector
 	dbROnlyDriver := drivers.NewPostgres(
 		config.Database.Username,
@@ -79,7 +80,7 @@ func main() {
 	// initialize the connection.
 	dbROnlyDriverInstance, err := dbROnlyDriver.Init()
 	if err != nil {
-		panic("Could not connect to the database: " + err.Error())
+		panic("Could not connect to the database: " + err.Error() + " Info: " + config.Database.Host + ":" + config.Database.Port)
 	}
 	// initialize repository
 	repoSymbolData := repository.NewSymbolData(dbROnlyDriverInstance)

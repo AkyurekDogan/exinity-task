@@ -7,8 +7,27 @@ run:
 	@go run $(RUN_PATH)
 
 local-setup:
-	docker build -t go-exinity-task-postgress -f ./scripts/database/Dockerfile ./scripts/database/
-	docker run --name go-exinity-task-postgress -p 5432:5432 -d go-exinity-task-postgress
+	@echo "Setting up local environment..."
+	cp .env.dist .env
+	@which yq >/dev/null 2>&1 || { \
+		echo "📦 Installing yq..."; \
+		brew install yq; \
+	}
+	@yq -i '.database.host = "localhost"' config.yml
+	@docker-compose -f docker-compose.local.yml up -d
+	@echo "Local environment is up and running, you can run the code in debug mode now!"
+	@echo "Done!"
+
+compose-up:
+	@echo "Setting up local environment..."
+	@which yq >/dev/null 2>&1 || { \
+		echo "📦 Installing yq..."; \
+		brew install yq; \
+	}
+	@yq -i '.database.host = "go-exinity-task-postgress"' config.yml
+	@echo "Docker container is getting up..."
+	@docker-compose -f docker-compose.yml up 
+	@echo "Done!"
 
 terraform-init:
 	terraform init

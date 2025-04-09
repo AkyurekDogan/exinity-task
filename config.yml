@@ -11,11 +11,11 @@ provider:
       - pepeusdt
 service:
   network: tcp
-  host: "localhost"
+  host: ""
   port: 50051
 database:
   password: "mypassword123!"
   username: "postgress"
-  host: localhost
+  host: "go-exinity-task-postgress"
   port: 5432
   database: exinity_task
