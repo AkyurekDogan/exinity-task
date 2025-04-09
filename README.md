@@ -147,21 +147,7 @@ You can also use [Postman](https://www.postman.com/) with its built-in gRPC clie
 
 ## 🧱 Architecture Diagram
 
-```
-+--------------------+        +-------------------+
-|   Binance WebSocket| -----> |   Data Aggregator |
-+--------------------+        +--------+----------+
-                                       |
-                                       v
-                              +--------+----------+
-                              |     gRPC Server    |
-                              +--------+----------+
-                                       |
-                                       v
-                            +----------+------------+
-                            |    PostgreSQL Database |
-                            +------------------------+
-```
+
 
 ---
 
