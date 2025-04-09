@@ -147,9 +147,7 @@ You can also use [Postman](https://www.postman.com/) with its built-in gRPC clie
 
 ## 🧱 Architecture Diagram
 
-Basic real-life diagram
-
-<img width="780" alt="Screenshot 2025-04-09 at 14 38 10" src="https://github.com/user-attachments/assets/9632a800-b498-4f05-9e56-6becb41cb37d" />
+![diagram-export-4-9-2025-2_55_10-PM](https://github.com/user-attachments/assets/a28740bb-1a6e-42c1-8aab-1c2abeb7568b)
 
 ---
 
