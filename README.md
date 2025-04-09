@@ -147,13 +147,13 @@ You can also use [Postman](https://www.postman.com/) with its built-in gRPC clie
 
 ## 🧱 Architecture Diagram
 
+Basic real-life diagram
 
+<img width="780" alt="Screenshot 2025-04-09 at 14 38 10" src="https://github.com/user-attachments/assets/9632a800-b498-4f05-9e56-6becb41cb37d" />
 
 ---
 
 ## 📸 Screenshots
-
-_ (Coming soon: VS Code debugger view, terminal output, grpcurl test result.)_
 
 ---
 
