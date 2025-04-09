@@ -151,9 +151,12 @@ You can also use [Postman](https://www.postman.com/) with its built-in gRPC clie
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenrecordings
 
----
+https://github.com/user-attachments/assets/2d545a79-01c7-4634-b20d-6407de453403
+
+
+
 
 ## 🤝 Contributing
 
