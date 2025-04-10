@@ -61,6 +61,7 @@ The source code is available at:
 - Docker installed on your system
 - (For developer mode) Go v1.23.2+
 - (Optional) VS Code for IDE support
+- If you want to run k8s mode, you need to install `minikube` on local k8s provider.
 
 ---
 
@@ -127,6 +128,26 @@ Ensure Docker is installed. Choose one of the following methods to run the proje
 
 > The gRPC server will be running at `localhost:50051`
 
+---
+
+#### :cloud_native Option 3: K8S 
+
+Before running the following commands you need to be sure that following items are done properly 
+- API docker image is on the local repository otherwise please use `.dockerfile` to create the build.
+- Minikube uses the custom acessibility logs for local access please consider minikube settings for `IP address` or `localhost` accesibility
+
+1. Run with Make:
+   ```
+    bash
+    make kubernetes-setup
+   ```
+
+> The gRPC server will be running at `localhost:30051`
+> If you want to access to database inside the k8s you can use the following command
+   ```
+   bash
+   kubectl port-forward svc/postgres 5432:5432 -n exinity-task
+   ```
 ---
 
 ### Step 3 – Test the gRPC API
