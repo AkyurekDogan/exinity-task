@@ -195,6 +195,10 @@ This is a sample project submitted to Exinity.
 ---
 
 ## 📬 Contact
+---
+
+*Dogan Akyurek*
+*akyurek.dogan.dgn@gmail.com*
 
 For questions or feedback, feel free to open an issue or reach out via *akyurek.dogan.dgn@gmail.com*
 
