@@ -36,14 +36,16 @@ A gRPC-based real-time symbol data service that streams 1-minute candlestick (OH
 
 ---
 
-### ⚠️ Known Limitations
+### ⚠️ Known Limitations / Missing parts
 
 Due to time constraints:
 
-- Unit are could not implemented due to timing.
+- Unit tests could not be implemented due to timing.
 - Integration, benchmark, contract, and e2e tests were omitted
 - Simpler design choices were made for clarity and speed
 - Used the *sugared* version of `zap` logger for ease of use — performance tuning was not prioritized
+- I could not complete the terraform part, so it is not working; files are created without check & run.
+- K8S configurations are done according to the `Minikube` on the local development environment.
 
 ---
 
@@ -130,7 +132,7 @@ Ensure Docker is installed. Choose one of the following methods to run the proje
 
 ---
 
-#### :cloud_native Option 3: K8S 
+#### 🐳 Option 3: K8S 
 
 Before running the following commands you need to be sure that following items are done properly 
 - API docker image is on the local repository otherwise please use `.dockerfile` to create the build.
