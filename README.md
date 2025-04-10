@@ -1,3 +1,8 @@
+# Task Owner
+---
+## Dogan Akyurek
+## akyurek.dogan.dgn@gmail.com
+---
 # Exinity | Symbol Data Provider
 
 A gRPC-based real-time symbol data service that streams 1-minute candlestick (OHLCV) data by aggregating live trade data from Binance.
