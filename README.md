@@ -135,8 +135,8 @@ Ensure Docker is installed. Choose one of the following methods to run the proje
 #### 🐳 Option 3: K8S 
 
 Before running the following commands you need to be sure that following items are done properly 
-- API docker image is on the local repository otherwise please use `.dockerfile` to create the build.
-- Minikube uses the custom acessibility logs for local access please consider minikube settings for `IP address` or `localhost` accesibility
+- API docker image is on the local repository otherwise please use `.dockerfile` to create the build using make file or docker commands.
+- Minikube uses the custom acessibility logs for local access please consider minikube settings for `IP address` or `localhost` accesibility.
 
 1. Run with Make:
    ```
