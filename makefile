@@ -2,7 +2,13 @@
 API="api"
 RUN_PATH="./cmd/api/main.go"
 
-# Build the Go project
+# Tooling 
+# --------------------------------------------------------------
+generate-grpc:
+	@protoc --go_out=./internal/app/proto  --go-grpc_out=./internal/app/proto ./internal/app/proto/candle.proto
+
+# Local run setup
+# --------------------------------------------------------------
 run:
 	@go run $(RUN_PATH)
 
@@ -18,6 +24,8 @@ local-setup:
 	@echo "Local environment is up and running, you can run the code in debug mode now!"
 	@echo "Done!"
 
+# Docker Compose setup 
+# --------------------------------------------------------------
 compose-up:
 	@echo "Setting up local environment..."
 	@which yq >/dev/null 2>&1 || { \
@@ -29,6 +37,39 @@ compose-up:
 	@docker-compose -f docker-compose.yml up 
 	@echo "Done!"
 
+# Kubernetes 
+# --------------------------------------------------------------
+kubernetes-setup:
+	@echo "Setting up k8s namespace for postgres ..."
+	@kubectl apply -f ./deploy/k8s/namespace.yml
+	@echo "Setting up k8s secrets..."
+	@kubectl apply -f ./deploy/k8s/postgres/secret.yml  
+	@echo "Setting up k8s configmap..."
+	@kubectl apply -f ./deploy/k8s/postgres/configmap.yml  
+	@echo "Setting up k8s deployments..."
+	@kubectl apply -f ./deploy/k8s/postgres/deployment.yml
+	@echo "Setting up k8s services..."
+	@kubectl apply -f ./deploy/k8s/postgres/service.yml
+	@echo "Postgres is done!"
+	
+	@echo "Setting up k8s for gRPC Api ..."
+	@echo "Setting up k8s secrets..."
+	@kubectl apply -f ./deploy/k8s/api/secret.yml  
+	@echo "Setting up k8s configmap..."
+	@kubectl apply -f ./deploy/k8s/api/configmap.yml  
+	@echo "Setting up k8s deployments..."
+	@kubectl apply -f ./deploy/k8s/api/deployment.yml
+	@echo "Setting up k8s services..."
+	@kubectl apply -f ./deploy/k8s/api/service.yml
+	@echo "API is done!"
+
+connect-kuberneter-postgres:
+	@echo "Routing the local connection to postgres pod..."
+	@kubectl port-forward svc/postgres 5432:5432 -n exinity-task
+	@echo "Done! You can connect via localhost:5432 now!"
+
+# Terraform 
+# --------------------------------------------------------------
 terraform-init:
 	terraform init
 	terraform apply
@@ -44,9 +85,3 @@ terraform-deploy-staging:
 terraform-deploy-production:
 	terraform init
 	terraform apply -var-file="environments/prod/terraform.tfvars"
-
-docker-compose:
-	docker-compose up
-
-generate-grpc:
-	@protoc --go_out=./internal/app/proto  --go-grpc_out=./internal/app/proto ./internal/app/proto/candle.proto

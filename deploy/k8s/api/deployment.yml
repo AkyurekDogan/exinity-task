@@ -1,28 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
-  namespace: exinity
+  name: go-exinity-task
+  namespace: exinity-task
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api
+      app: go-exinity-task
   template:
     metadata:
       labels:
-        app: api
+        app: go-exinity-task
     spec:
       containers:
-        - name: api
-          image: your-dockerhub-user/api:latest
+        - name: go-exinity-task
+          image: go-exinity-task:latest  # Your Go API Docker image
           ports:
-            - containerPort: 8080
+            - containerPort: 50051
           envFrom:
-            - configMapRef:
-                name: app-config
             - secretRef:
-                name: db-secret
-          env:
-            - name: DB_HOST
-              value: "postgres"
+                name: api-db-secret
+            - configMapRef:
+                name: go-api-config   # Reference the ConfigMap here

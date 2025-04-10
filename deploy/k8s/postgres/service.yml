@@ -4,7 +4,10 @@ metadata:
   name: postgres
   namespace: exinity-task
 spec:
-  ports:
-    - port: 5432
+  type: ClusterIP
   selector:
     app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

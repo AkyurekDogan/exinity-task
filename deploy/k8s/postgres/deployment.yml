@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: exinity
+  namespace: exinity-task
 spec:
   replicas: 1
   selector:
@@ -16,14 +16,35 @@ spec:
       containers:
         - name: postgres
           image: postgres:16
+          ports:
+            - containerPort: 5432
           envFrom:
             - secretRef:
                 name: db-secret
-          ports:
-            - containerPort: 5432
           volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: pgdata
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: sql-scripts
+              mountPath: /docker-entrypoint-initdb.d  # PostgreSQL runs SQL files from this directory on startup
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+            initialDelaySeconds: 30
+            periodSeconds: 10
       volumes:
         - name: pgdata
-          emptyDir: {}
+          emptyDir: {}  # You can change this to a PVC if you want data persistence
+        - name: sql-scripts
+          configMap:
+            name: postgres-init-sql  # Referencing the ConfigMap
